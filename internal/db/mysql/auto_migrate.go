@@ -1,5 +1,7 @@
 package mysql
 
+import "github.com/jiojioo/gin_template/internal/model"
+
 func AutoMigrate() error {
-	return nil
+	return Client.AutoMigrate(&model.User{})
 }

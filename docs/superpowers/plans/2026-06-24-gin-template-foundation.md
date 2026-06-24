@@ -193,19 +193,19 @@ Run: `git add internal/middleware internal/handler internal/router && git commit
 **Interfaces:**
 - Consumes: `config.MustLoad`, logger initialization, `db.Init`, `router.InitRouter`.
 
-- [ ] **Step 1: Write failing startup composition test**
+- [x] **Step 1: Write failing startup composition test**
 
 ```go
 func TestApplicationBuildsRouterAfterDependencies(t *testing.T) { /* inject initialized test dependencies; assert routes */ }
 ```
 
-- [ ] **Step 2: Run tests to verify failure**
+- [x] **Step 2: Run tests to verify failure**
 
 Run: `go test ./...`
 
 Expected: FAIL until entrypoint composition and remaining dependencies are complete.
 
-- [ ] **Step 3: Implement startup composition and operational documentation**
+- [x] **Step 3: Implement startup composition and operational documentation**
 
 ```go
 cfg := config.MustLoad("etc/config.yaml")
@@ -213,13 +213,13 @@ if err := db.Init(cfg); err != nil { panic(err) }
 router.InitRouter(cfg).Run(cfg.Server.Addr)
 ```
 
-- [ ] **Step 4: Run final verification**
+- [x] **Step 4: Run final verification**
 
 Run: `gofmt -w .; go test ./...; go vet ./...`
 
 Expected: all commands exit 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run: `git add main.go README.md && git commit -m "docs: document gin template startup"`
 
