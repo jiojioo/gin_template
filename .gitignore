@@ -1,0 +1,30 @@
+# Node
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Agent / local tooling cache
+.agent/
+.agents/
+.codegraph/
+.codex/
+.comet/
+
+# Temp
+tmp/
+temp/
