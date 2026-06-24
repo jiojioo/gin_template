@@ -52,3 +52,82 @@ log:
 		t.Fatalf("unexpected log config: %#v", cfg.Log)
 	}
 }
+
+func TestMustLoadPanicsWhenRequiredFieldsAreMissing(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		contents string
+	}{
+		{
+			name: "server addr",
+			contents: `server:
+  name: test-app
+  mode: test
+mysql:
+  dsn: "user:pass@tcp(localhost:3306)/test"
+redis:
+  addr: "localhost:6379"
+jwt:
+  secret: "test-secret"
+`,
+		},
+		{
+			name: "mysql dsn",
+			contents: `server:
+  addr: ":8081"
+mysql:
+  max_idle_conns: 2
+redis:
+  addr: "localhost:6379"
+jwt:
+  secret: "test-secret"
+`,
+		},
+		{
+			name: "redis addr",
+			contents: `server:
+  addr: ":8081"
+mysql:
+  dsn: "user:pass@tcp(localhost:3306)/test"
+redis:
+  db: 0
+jwt:
+  secret: "test-secret"
+`,
+		},
+		{
+			name: "jwt secret",
+			contents: `server:
+  addr: ":8081"
+mysql:
+  dsn: "user:pass@tcp(localhost:3306)/test"
+redis:
+  addr: "localhost:6379"
+jwt:
+  expire: 7200
+`,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			path := filepath.Join(t.TempDir(), "config.yaml")
+			if err := os.WriteFile(path, []byte(tt.contents), 0o600); err != nil {
+				t.Fatal(err)
+			}
+
+			defer func() {
+				if recover() == nil {
+					t.Fatalf("MustLoad() did not panic for missing %s", tt.name)
+				}
+			}()
+
+			_ = MustLoad(path)
+		})
+	}
+}

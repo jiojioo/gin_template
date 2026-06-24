@@ -32,7 +32,7 @@
 **Interfaces:**
 - Produces: `config.MustLoad(path string) *config.Config`, `hash.Make(string) (string, error)`, `hash.Check(string, string) bool`, `jwt.GenerateToken(uint64) (string, error)`, `jwt.ParseToken(string) (*Claims, error)`, `response.Success(*gin.Context, any)`, `response.Fail(*gin.Context, int, string)`.
 
-- [ ] **Step 1: Write failing configuration and utility tests**
+- [x] **Step 1: Write failing configuration and utility tests**
 
 ```go
 func TestPasswordRoundTrip(t *testing.T) {
@@ -42,26 +42,26 @@ func TestPasswordRoundTrip(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run tests to verify failure**
+- [x] **Step 2: Run tests to verify failure**
 
 Run: `go test ./internal/config ./pkg/hash ./pkg/jwt ./pkg/response`
 
 Expected: FAIL because packages do not exist.
 
-- [ ] **Step 3: Implement module, typed config and utilities**
+- [x] **Step 3: Implement module, typed config and utilities**
 
 ```go
 type Config struct { Server ServerConfig `yaml:"server"`; MySQL MySQLConfig `yaml:"mysql"`; Redis RedisConfig `yaml:"redis"`; JWT JWTConfig `yaml:"jwt"`; Log LogConfig `yaml:"log"` }
 type Body struct { Code int `json:"code"`; Message string `json:"message"`; Data any `json:"data,omitempty"` }
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `go test ./internal/config ./pkg/hash ./pkg/jwt ./pkg/response`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run: `git add go.mod main.go etc internal/config pkg && git commit -m "feat: add template configuration and shared contracts"`
 

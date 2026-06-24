@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	jwtlib "github.com/golang-jwt/jwt/v5"
 	jwtutil "github.com/jiojioo/gin_template/pkg/jwt"
 )
 
@@ -33,5 +34,24 @@ func TestParseTokenRejectsWrongSecret(t *testing.T) {
 
 	if _, err := jwtutil.ParseToken(token); err == nil {
 		t.Fatal("ParseToken() accepted token signed with a different secret")
+	}
+}
+
+func TestParseTokenRejectsTokenWithoutExpiration(t *testing.T) {
+	jwtutil.Configure(jwtutil.Config{Secret: "test-secret", Expire: time.Hour})
+
+	claims := jwtutil.Claims{
+		UserID: 42,
+		RegisteredClaims: jwtlib.RegisteredClaims{
+			IssuedAt: jwtlib.NewNumericDate(time.Now()),
+		},
+	}
+	token, err := jwtlib.NewWithClaims(jwtlib.SigningMethodHS256, claims).SignedString([]byte("test-secret"))
+	if err != nil {
+		t.Fatalf("SignedString() error = %v", err)
+	}
+
+	if _, err := jwtutil.ParseToken(token); err == nil {
+		t.Fatal("ParseToken() accepted token without expiration")
 	}
 }

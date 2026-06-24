@@ -4,6 +4,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -59,5 +60,24 @@ func MustLoad(path string) *Config {
 	if err := yaml.Unmarshal(contents, &cfg); err != nil {
 		panic(fmt.Errorf("decode config %q: %w", path, err))
 	}
+	if err := cfg.validateRequired(); err != nil {
+		panic(fmt.Errorf("validate config %q: %w", path, err))
+	}
 	return &cfg
+}
+
+func (cfg Config) validateRequired() error {
+	if strings.TrimSpace(cfg.Server.Addr) == "" {
+		return fmt.Errorf("server.addr is required")
+	}
+	if strings.TrimSpace(cfg.MySQL.DSN) == "" {
+		return fmt.Errorf("mysql.dsn is required")
+	}
+	if strings.TrimSpace(cfg.Redis.Addr) == "" {
+		return fmt.Errorf("redis.addr is required")
+	}
+	if strings.TrimSpace(cfg.JWT.Secret) == "" {
+		return fmt.Errorf("jwt.secret is required")
+	}
+	return nil
 }

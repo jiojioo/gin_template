@@ -69,6 +69,9 @@ func ParseToken(raw string) (*Claims, error) {
 	if !token.Valid {
 		return nil, errors.New("invalid jwt token")
 	}
+	if claims.ExpiresAt == nil {
+		return nil, errors.New("jwt token expiration is required")
+	}
 	return claims, nil
 }
 
