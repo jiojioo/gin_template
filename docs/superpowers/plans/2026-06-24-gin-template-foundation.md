@@ -155,32 +155,32 @@ Run: `git add internal/model internal/repo internal/service && git commit -m "fe
 **Interfaces:**
 - Consumes: `service.UserService`; produces `router.InitRouter(*config.Config, *handler.Handler) *gin.Engine` and routes `/api/v1/user/login`, `/api/v1/user/info`.
 
-- [ ] **Step 1: Write failing HTTP tests**
+- [x] **Step 1: Write failing HTTP tests**
 
 ```go
 req := httptest.NewRequest(http.MethodPost, "/api/v1/user/login", strings.NewReader(`{"username":"u","password":"p"}`))
 req.Header.Set("Content-Type", "application/json")
 ```
 
-- [ ] **Step 2: Run tests to verify failure**
+- [x] **Step 2: Run tests to verify failure**
 
 Run: `go test ./internal/router`
 
 Expected: FAIL because routes are not registered.
 
-- [ ] **Step 3: Implement HTTP boundary and JWT middleware**
+- [x] **Step 3: Implement HTTP boundary and JWT middleware**
 
 ```go
 func Auth() gin.HandlerFunc { return func(c *gin.Context) { /* parse Bearer JWT; set user_id; abort 401 on failure */ } }
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `go test ./internal/handler/... ./internal/middleware ./internal/router`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run: `git add internal/middleware internal/handler internal/router && git commit -m "feat: add user authentication HTTP flow"`
 

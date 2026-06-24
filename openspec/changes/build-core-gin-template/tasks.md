@@ -16,17 +16,17 @@
 
 - [x] 3.1 定义基础模型和用户模型，包含安全的 JSON 字段与 GORM 表映射。
 - [x] 3.2 实现 `UserRepo` 的按 ID、按用户名和写入数据访问方法，并只接受标准 context。
-- [ ] 3.3 实现 Service 容器和 Handler 容器，明确依赖注入边界。
-- [ ] 3.4 实现 CORS、JWT Auth 和 Recovery/日志中间件装配。
-- [ ] 3.5 实现总路由与 user 路由注册，确保 Router 不承载业务逻辑。
+- [x] 3.3 实现 Service 容器和 Handler 容器，明确依赖注入边界。
+- [x] 3.4 实现 CORS、JWT Auth 和 Recovery/日志中间件装配。
+- [x] 3.5 实现总路由与 user 路由注册，确保 Router 不承载业务逻辑。
 
 ## 4. 用户认证样板
 
-- [ ] 4.1 实现 `UserService.Login`：查询用户、校验 bcrypt 密码并签发带 user ID 的 JWT。
-- [ ] 4.2 实现 `UserService.GetUserInfo`：查询用户并仅组装安全的个人资料字段。
-- [ ] 4.3 实现登录 Handler 的 JSON 绑定、校验和统一成功/失败响应。
-- [ ] 4.4 实现用户信息 Handler，并通过 Auth 中间件读取 `user_id`。
-- [ ] 4.5 注册 `POST /api/v1/user/login` 与受保护的 `GET /api/v1/user/info`。
+- [x] 4.1 实现 `UserService.Login`：查询用户、校验 bcrypt 密码并签发带 user ID 的 JWT。
+- [x] 4.2 实现 `UserService.GetUserInfo`：查询用户并仅组装安全的个人资料字段。
+- [x] 4.3 实现登录 Handler 的 JSON 绑定、校验和统一成功/失败响应。
+- [x] 4.4 实现用户信息 Handler，并通过 Auth 中间件读取 `user_id`。
+- [x] 4.5 注册 `POST /api/v1/user/login` 与受保护的 `GET /api/v1/user/info`。
 
 ## 5. 验证与文档
 
