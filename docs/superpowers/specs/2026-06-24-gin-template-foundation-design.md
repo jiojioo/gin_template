@@ -2,6 +2,8 @@
 comet_change: build-core-gin-template
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-24-build-core-gin-template
+status: final
 ---
 
 # Gin Template Foundation Design
