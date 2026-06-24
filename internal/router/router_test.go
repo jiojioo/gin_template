@@ -103,6 +103,23 @@ func TestRouterRejectsLoginWithMissingFields(t *testing.T) {
 	}
 }
 
+func TestRouterRejectsLoginWithWhitespaceFields(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	jwtCfg := jwtutil.Config{Secret: "test-secret", Expire: time.Hour}
+	users := fakeUsers{user: &model.User{Username: "alice", Password: "encoded"}}
+	services := service.NewService(&repo.Repository{User: users}, nil, jwtCfg)
+	engine := router.InitRouter(&config.Config{}, handler.NewHandler(services), jwtCfg)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/user/login", strings.NewReader(`{"username":"   ","password":"  "}`))
+	req.Header.Set("Content-Type", "application/json")
+	resp := httptest.NewRecorder()
+	engine.ServeHTTP(resp, req)
+
+	if resp.Code != http.StatusBadRequest {
+		t.Fatalf("whitespace fields status = %d, want 400; body = %s", resp.Code, resp.Body.String())
+	}
+}
+
 func TestRouterLoginInvalidCredentialsReturnsGenericMessage(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	encoded, err := hash.Make("secret")
@@ -163,5 +180,14 @@ func TestRouterUserInfoMissingUserReturnsGenericFailure(t *testing.T) {
 	}
 	if strings.Contains(resp.Body.String(), "record not found") || strings.Contains(resp.Body.String(), "gorm") {
 		t.Fatalf("missing user leaked persistence detail: %s", resp.Body.String())
+	}
+	var got struct {
+		Message string `json:"message"`
+	}
+	if err := json.Unmarshal(resp.Body.Bytes(), &got); err != nil {
+		t.Fatalf("decode body: %v", err)
+	}
+	if got.Message != "user not found" {
+		t.Fatalf("message = %q, want %q", got.Message, "user not found")
 	}
 }

@@ -66,8 +66,9 @@ func TestUserServiceLoginRejectsInvalidPassword(t *testing.T) {
 	}
 	svc := NewUserService(fakeUsers{user: &model.User{Password: encoded}}, nil, jwtutil.Config{Secret: "test-secret", Expire: time.Hour})
 
-	if _, err := svc.Login(context.Background(), &LoginReq{Username: "alice", Password: "wrong"}); err == nil {
-		t.Fatal("Login() accepted invalid password")
+	_, err = svc.Login(context.Background(), &LoginReq{Username: "alice", Password: "wrong"})
+	if !errors.Is(err, ErrInvalidCredentials) {
+		t.Fatalf("Login() error = %v, want ErrInvalidCredentials", err)
 	}
 }
 

@@ -3,6 +3,7 @@ package user
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jiojioo/gin_template/internal/service"
@@ -13,6 +14,10 @@ func (h *Handler) Login(c *gin.Context) {
 	var req service.LoginReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Fail(c, http.StatusBadRequest, "invalid login request")
+		return
+	}
+	if strings.TrimSpace(req.Username) == "" || strings.TrimSpace(req.Password) == "" {
+		response.Fail(c, http.StatusBadRequest, "username and password are required")
 		return
 	}
 	resp, err := h.users.Login(c.Request.Context(), &req)
