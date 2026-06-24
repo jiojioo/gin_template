@@ -75,19 +75,19 @@ Run: `git add go.mod main.go etc internal/config pkg && git commit -m "feat: add
 **Interfaces:**
 - Produces: `logger.Init(config.LogConfig) error`, `logger.InitGinWriter(config.LogConfig) error`, `mysql.Init(config.MySQLConfig) error`, `redis.Init(config.RedisConfig) error`, `db.Init(*config.Config) error`.
 
-- [ ] **Step 1: Write failing rotation and startup-order tests**
+- [x] **Step 1: Write failing rotation and startup-order tests**
 
 ```go
 func TestRotateWriterCreatesHourlyFile(t *testing.T) { /* inject clock; assert hourly file name */ }
 ```
 
-- [ ] **Step 2: Run tests to verify failure**
+- [x] **Step 2: Run tests to verify failure**
 
 Run: `go test ./pkg/logger ./internal/db/...`
 
 Expected: FAIL because logger and database packages do not exist.
 
-- [ ] **Step 3: Implement fail-fast clients and writers**
+- [x] **Step 3: Implement fail-fast clients and writers**
 
 ```go
 func Init(cfg *config.Config) error {
@@ -98,13 +98,13 @@ func Init(cfg *config.Config) error {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `go test ./pkg/logger ./internal/db/...`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run: `git add pkg/logger internal/db && git commit -m "feat: add logging and startup infrastructure"`
 
