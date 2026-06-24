@@ -1,0 +1,27 @@
+server:
+  name: gin_template
+  mode: debug
+  addr: ":8080"
+
+mysql:
+  dsn: "root:123456@tcp(127.0.0.1:3306)/gin_template?charset=utf8mb4&parseTime=True&loc=Local"
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600
+
+redis:
+  addr: "127.0.0.1:6379"
+  password: ""
+  db: 0
+
+jwt:
+  secret: "replace-this-development-secret"
+  expire: 7200
+
+log:
+  path: "./logs"
+  level: "debug"
+  keep_hours: 4
+  filename: "app.log"
+  access_filename: "gin_access_log"
+  error_filename: "gin_error_log"
