@@ -34,3 +34,8 @@
 - [x] 5.2 为 Repo/Service 及登录、鉴权用户信息链路编写可重复执行的测试。
 - [x] 5.3 执行格式化、静态检查和测试；修复所有回归。
 - [x] 5.4 更新 README，说明配置、MySQL/Redis 前置条件、启动方式、API 示例与安全配置要求。
+
+## 6. 验证修复（verify-fail 回退）
+
+- [x] 6.1 修复登录必填字段校验：为 `LoginReq` 添加 `binding:"required"`，确保省略 username/password 返回 HTTP 400（验证报告 WARNING 1）。
+- [x] 6.2 修复错误响应信息泄露：repo 将 `gorm.ErrRecordNotFound` 翻译为领域错误，service 不区分用户不存在与密码错误，handler 返回通用消息且不暴露持久层细节（验证报告 WARNING 2）。

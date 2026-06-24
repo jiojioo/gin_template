@@ -85,3 +85,83 @@ func TestRouterRegistersLoginAndProtectedUserInfo(t *testing.T) {
 		t.Fatalf("user info leaked password hash: %s", infoResp.Body.String())
 	}
 }
+
+func TestRouterRejectsLoginWithMissingFields(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	jwtCfg := jwtutil.Config{Secret: "test-secret", Expire: time.Hour}
+	users := fakeUsers{user: &model.User{Username: "alice", Password: "encoded"}}
+	services := service.NewService(&repo.Repository{User: users}, nil, jwtCfg)
+	engine := router.InitRouter(&config.Config{}, handler.NewHandler(services), jwtCfg)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/user/login", strings.NewReader(`{}`))
+	req.Header.Set("Content-Type", "application/json")
+	resp := httptest.NewRecorder()
+	engine.ServeHTTP(resp, req)
+
+	if resp.Code != http.StatusBadRequest {
+		t.Fatalf("missing fields status = %d, want 400; body = %s", resp.Code, resp.Body.String())
+	}
+}
+
+func TestRouterLoginInvalidCredentialsReturnsGenericMessage(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	encoded, err := hash.Make("secret")
+	if err != nil {
+		t.Fatalf("hash.Make() error = %v", err)
+	}
+	jwtCfg := jwtutil.Config{Secret: "test-secret", Expire: time.Hour}
+	users := fakeUsers{user: &model.User{
+		BaseModel: model.BaseModel{ID: 42},
+		Username:  "alice",
+		Password:  encoded,
+	}}
+	services := service.NewService(&repo.Repository{User: users}, nil, jwtCfg)
+	engine := router.InitRouter(&config.Config{}, handler.NewHandler(services), jwtCfg)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/user/login", strings.NewReader(`{"username":"alice","password":"wrong"}`))
+	req.Header.Set("Content-Type", "application/json")
+	resp := httptest.NewRecorder()
+	engine.ServeHTTP(resp, req)
+
+	if resp.Code != http.StatusUnauthorized {
+		t.Fatalf("invalid creds status = %d, want 401; body = %s", resp.Code, resp.Body.String())
+	}
+	if strings.Contains(resp.Body.String(), "record not found") {
+		t.Fatalf("invalid creds leaked persistence detail: %s", resp.Body.String())
+	}
+	var got struct {
+		Message string `json:"message"`
+	}
+	if err := json.Unmarshal(resp.Body.Bytes(), &got); err != nil {
+		t.Fatalf("decode body: %v", err)
+	}
+	if got.Message != "invalid username or password" {
+		t.Fatalf("message = %q, want %q", got.Message, "invalid username or password")
+	}
+}
+
+func TestRouterUserInfoMissingUserReturnsGenericFailure(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	jwtCfg := jwtutil.Config{Secret: "test-secret", Expire: time.Hour}
+	users := fakeUsers{err: repo.ErrNotFound}
+	services := service.NewService(&repo.Repository{User: users}, nil, jwtCfg)
+	engine := router.InitRouter(&config.Config{}, handler.NewHandler(services), jwtCfg)
+
+	jwtutil.Configure(jwtCfg)
+	token, err := jwtutil.GenerateToken(42)
+	if err != nil {
+		t.Fatalf("GenerateToken() error = %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/user/info", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp := httptest.NewRecorder()
+	engine.ServeHTTP(resp, req)
+
+	if resp.Code != http.StatusNotFound {
+		t.Fatalf("missing user status = %d, want 404; body = %s", resp.Code, resp.Body.String())
+	}
+	if strings.Contains(resp.Body.String(), "record not found") || strings.Contains(resp.Body.String(), "gorm") {
+		t.Fatalf("missing user leaked persistence detail: %s", resp.Body.String())
+	}
+}

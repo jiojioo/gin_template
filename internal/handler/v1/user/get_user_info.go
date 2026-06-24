@@ -1,9 +1,11 @@
 package user
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jiojioo/gin_template/internal/service"
 	"github.com/jiojioo/gin_template/pkg/response"
 )
 
@@ -20,7 +22,11 @@ func (h *Handler) GetUserInfo(c *gin.Context) {
 	}
 	profile, err := h.users.GetUserInfo(c.Request.Context(), userID)
 	if err != nil {
-		response.Fail(c, http.StatusInternalServerError, err.Error())
+		if errors.Is(err, service.ErrUserNotFound) {
+			response.Fail(c, http.StatusNotFound, "user not found")
+			return
+		}
+		response.Fail(c, http.StatusInternalServerError, "unable to load user")
 		return
 	}
 	response.Success(c, profile)

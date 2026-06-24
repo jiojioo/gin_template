@@ -10,7 +10,10 @@ import (
 	redislib "github.com/redis/go-redis/v9"
 )
 
-var ErrInvalidCredentials = errors.New("invalid username or password")
+var (
+	ErrInvalidCredentials = errors.New("invalid username or password")
+	ErrUserNotFound       = errors.New("user not found")
+)
 
 type UserService struct {
 	users       repo.UserRepository
@@ -19,8 +22,8 @@ type UserService struct {
 }
 
 type LoginReq struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type LoginResp struct {
@@ -43,6 +46,11 @@ func NewUserService(users repo.UserRepository, redisClient *redislib.Client, jwt
 func (s *UserService) Login(ctx context.Context, req *LoginReq) (*LoginResp, error) {
 	user, err := s.users.FindByUsername(ctx, req.Username)
 	if err != nil {
+		// A missing user is indistinguishable from a bad password so that
+		// login failures do not leak which usernames exist.
+		if errors.Is(err, repo.ErrNotFound) {
+			return nil, ErrInvalidCredentials
+		}
 		return nil, err
 	}
 	if !hash.Check(req.Password, user.Password) {
@@ -59,6 +67,9 @@ func (s *UserService) Login(ctx context.Context, req *LoginReq) (*LoginResp, err
 func (s *UserService) GetUserInfo(ctx context.Context, userID uint64) (*GetUserInfoResp, error) {
 	user, err := s.users.FindByID(ctx, userID)
 	if err != nil {
+		if errors.Is(err, repo.ErrNotFound) {
+			return nil, ErrUserNotFound
+		}
 		return nil, err
 	}
 	return &GetUserInfoResp{

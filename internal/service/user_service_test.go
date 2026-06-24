@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jiojioo/gin_template/internal/model"
+	"github.com/jiojioo/gin_template/internal/repo"
 	"github.com/jiojioo/gin_template/pkg/hash"
 	jwtutil "github.com/jiojioo/gin_template/pkg/jwt"
 )
@@ -97,5 +98,23 @@ func TestUserServiceReturnsRepositoryErrors(t *testing.T) {
 	}
 	if _, err := svc.GetUserInfo(context.Background(), 42); !errors.Is(err, failure) {
 		t.Fatalf("GetUserInfo() error = %v, want %v", err, failure)
+	}
+}
+
+func TestUserServiceLoginTreatsMissingUserAsInvalidCredentials(t *testing.T) {
+	svc := NewUserService(fakeUsers{err: repo.ErrNotFound}, nil, jwtutil.Config{Secret: "test-secret", Expire: time.Hour})
+
+	_, err := svc.Login(context.Background(), &LoginReq{Username: "ghost", Password: "secret"})
+	if !errors.Is(err, ErrInvalidCredentials) {
+		t.Fatalf("Login() error = %v, want ErrInvalidCredentials", err)
+	}
+}
+
+func TestUserServiceGetUserInfoMapsMissingUser(t *testing.T) {
+	svc := NewUserService(fakeUsers{err: repo.ErrNotFound}, nil, jwtutil.Config{Secret: "test-secret", Expire: time.Hour})
+
+	_, err := svc.GetUserInfo(context.Background(), 42)
+	if !errors.Is(err, ErrUserNotFound) {
+		t.Fatalf("GetUserInfo() error = %v, want ErrUserNotFound", err)
 	}
 }

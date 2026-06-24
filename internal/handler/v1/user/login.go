@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,11 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 	resp, err := h.users.Login(c.Request.Context(), &req)
 	if err != nil {
-		response.Fail(c, http.StatusUnauthorized, err.Error())
+		if errors.Is(err, service.ErrInvalidCredentials) {
+			response.Fail(c, http.StatusUnauthorized, "invalid username or password")
+			return
+		}
+		response.Fail(c, http.StatusInternalServerError, "login failed")
 		return
 	}
 	response.Success(c, resp)
