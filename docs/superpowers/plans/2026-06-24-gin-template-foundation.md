@@ -117,32 +117,32 @@ Run: `git add pkg/logger internal/db && git commit -m "feat: add logging and sta
 **Interfaces:**
 - Produces: `repo.UserRepository`, `service.NewUserService(repo.UserRepository, *redis.Client, jwt.Config)`, `(*UserService).Login(context.Context, *LoginReq) (*LoginResp, error)`, `(*UserService).GetUserInfo(context.Context, uint64) (*GetUserInfoResp, error)`.
 
-- [ ] **Step 1: Write failing Service tests with fake repository**
+- [x] **Step 1: Write failing Service tests with fake repository**
 
 ```go
 type fakeUsers struct { user *model.User; err error }
 func (f fakeUsers) FindByUsername(context.Context, string) (*model.User, error) { return f.user, f.err }
 ```
 
-- [ ] **Step 2: Run tests to verify failure**
+- [x] **Step 2: Run tests to verify failure**
 
 Run: `go test ./internal/service`
 
 Expected: FAIL because service and repository interfaces do not exist.
 
-- [ ] **Step 3: Implement GORM repository, DTOs and container**
+- [x] **Step 3: Implement GORM repository, DTOs and container**
 
 ```go
 type UserRepository interface { FindByID(context.Context, uint64) (*model.User, error); FindByUsername(context.Context, string) (*model.User, error) }
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `go test ./internal/service ./internal/repo`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run: `git add internal/model internal/repo internal/service && git commit -m "feat: add user data and service layers"`
 

@@ -14,8 +14,8 @@
 
 ## 3. 分层装配与 HTTP 基线
 
-- [ ] 3.1 定义基础模型和用户模型，包含安全的 JSON 字段与 GORM 表映射。
-- [ ] 3.2 实现 `UserRepo` 的按 ID、按用户名和写入数据访问方法，并只接受标准 context。
+- [x] 3.1 定义基础模型和用户模型，包含安全的 JSON 字段与 GORM 表映射。
+- [x] 3.2 实现 `UserRepo` 的按 ID、按用户名和写入数据访问方法，并只接受标准 context。
 - [ ] 3.3 实现 Service 容器和 Handler 容器，明确依赖注入边界。
 - [ ] 3.4 实现 CORS、JWT Auth 和 Recovery/日志中间件装配。
 - [ ] 3.5 实现总路由与 user 路由注册，确保 Router 不承载业务逻辑。
